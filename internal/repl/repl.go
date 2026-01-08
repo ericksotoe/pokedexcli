@@ -7,11 +7,17 @@ import (
 	"strings"
 )
 
+// this struct will hold the next and previous urls for the map command
+type config struct {
+	Next     string
+	Previous string
+}
+
 // Cli command struct that stores functions depending on user input
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(cfg *config, args []string) error
 }
 
 // This function holds all the commands that can be entered into the cli
@@ -29,13 +35,22 @@ func getCommands() map[string]cliCommand {
 		},
 		"map": {
 			name:        "map",
-			description: "",
+			description: "Displays the next 20 locations",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Displays the previous 20 locations",
+			callback:    commandMapB,
 		},
 	}
 }
 
 func StartRepl() {
 	scanner := bufio.NewScanner(os.Stdin)
+	cfg := &config{}
+	cfg.Next = "https://pokeapi.co/api/v2/location-area/"
+	cfg.Previous = ""
 
 	for {
 		fmt.Print("Pokedex > ")
@@ -49,9 +64,12 @@ func StartRepl() {
 			continue
 		}
 
-		command, ok := getCommands()[userInputSlice[0]]
+		cmdName := userInputSlice[0]
+		args := userInputSlice[1:]
+
+		command, ok := getCommands()[cmdName]
 		if ok {
-			if err := command.callback(); err != nil {
+			if err := command.callback(cfg, args); err != nil {
 				fmt.Println(err)
 			}
 			continue
