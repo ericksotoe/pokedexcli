@@ -2,25 +2,35 @@ package repl
 
 import (
 	"fmt"
-
-	"github.com/ericksotoe/pokedexcli/internal/pokeapi"
 )
 
-func commandMap(cfg *config, args []string) error {
-	pokemonMap, err := pokeapi.GetLocationAreas(cfg.Next)
+func commandMap(cfg *Config, args []string) error {
+	pokemonMap, err := cfg.PokeApiClient.GetLocationAreas(cfg.Next)
 	if err != nil {
 		return err
 	}
 
-	if pokemonMap.Previous != nil {
-		cfg.Previous = *pokemonMap.Previous
-	} else {
-		cfg.Previous = ""
+	cfg.Next = pokemonMap.Next
+	cfg.Previous = pokemonMap.Previous
+
+	for _, cityData := range pokemonMap.Results {
+		fmt.Println(cityData.Name)
+	}
+	return nil
+}
+
+func commandMapB(cfg *Config, args []string) error {
+	if cfg.Previous == nil {
+		return fmt.Errorf("you're on the first page")
 	}
 
-	if pokemonMap.Next != nil {
-		cfg.Next = *pokemonMap.Next
+	pokemonMap, err := cfg.PokeApiClient.GetLocationAreas(cfg.Previous)
+	if err != nil {
+		return err
 	}
+
+	cfg.Next = pokemonMap.Next
+	cfg.Previous = pokemonMap.Previous
 
 	for _, cityData := range pokemonMap.Results {
 		fmt.Println(cityData.Name)

@@ -18,26 +18,35 @@ type PokeMap struct {
 	} `json:"results"`
 }
 
-func GetLocationAreas(url string) (PokeMap, error) {
-	res, err := http.Get(url)
+func (c *Client) GetLocationAreas(pageURL *string) (PokeMap, error) {
+	url := baseURL + "/location-area"
+	if pageURL != nil {
+		url = *pageURL
+	}
+
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return PokeMap{}, err
 	}
 
-	body, err := io.ReadAll(res.Body)
+	res, err := c.httpClient.Do(req)
+	if err != nil {
+		return PokeMap{}, err
+	}
 	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
 	if res.StatusCode > 299 {
 		return PokeMap{}, fmt.Errorf("Response failed with status code: %d and \nbody: %s\n", res.StatusCode, body)
 	}
-
 	if err != nil {
 		return PokeMap{}, err
 	}
 
-	pokemonMap := PokeMap{}
-	err = json.Unmarshal(body, &pokemonMap)
+	pokemonLocations := PokeMap{}
+	err = json.Unmarshal(body, &pokemonLocations)
 	if err != nil {
 		return PokeMap{}, err
 	}
-	return pokemonMap, nil
+	return pokemonLocations, nil
 }

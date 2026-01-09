@@ -5,19 +5,22 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/ericksotoe/pokedexcli/internal/pokeapi"
 )
 
 // this struct will hold the next and previous urls for the map command
-type config struct {
-	Next     string
-	Previous string
+type Config struct {
+	PokeApiClient pokeapi.Client
+	Next          *string
+	Previous      *string
 }
 
 // Cli command struct that stores functions depending on user input
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(cfg *config, args []string) error
+	callback    func(cfg *Config, args []string) error
 }
 
 // This function holds all the commands that can be entered into the cli
@@ -46,11 +49,8 @@ func getCommands() map[string]cliCommand {
 	}
 }
 
-func StartRepl() {
+func StartRepl(cfg *Config) {
 	scanner := bufio.NewScanner(os.Stdin)
-	cfg := &config{}
-	cfg.Next = "https://pokeapi.co/api/v2/location-area/"
-	cfg.Previous = ""
 
 	for {
 		fmt.Print("Pokedex > ")
