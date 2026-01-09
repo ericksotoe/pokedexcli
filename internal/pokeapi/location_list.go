@@ -20,6 +20,8 @@ type PokeMap struct {
 
 func (c *Client) GetLocationAreas(pageURL *string) (PokeMap, error) {
 	url := baseURL + "/location-area"
+	
+	// pageURL will only be nil at the start of the program
 	if pageURL != nil {
 		url = *pageURL
 	}
