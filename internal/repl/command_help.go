@@ -1,6 +1,8 @@
 package repl
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func commandHelp(cfg *Config, args []string) error {
 	fmt.Println("Welcome to the Pokedex!")

@@ -20,10 +20,20 @@ type PokeMap struct {
 
 func (c *Client) GetLocationAreas(pageURL *string) (PokeMap, error) {
 	url := baseURL + "/location-area"
-	
+
 	// pageURL will only be nil at the start of the program
 	if pageURL != nil {
 		url = *pageURL
+	}
+
+	val, ok := c.PokeCache.Get(url)
+	if ok {
+		pokemonLocations := PokeMap{}
+		err := json.Unmarshal(val, &pokemonLocations)
+		if err != nil {
+			return PokeMap{}, err
+		}
+		return pokemonLocations, nil
 	}
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -45,6 +55,7 @@ func (c *Client) GetLocationAreas(pageURL *string) (PokeMap, error) {
 		return PokeMap{}, err
 	}
 
+	c.PokeCache.Add(url, body)
 	pokemonLocations := PokeMap{}
 	err = json.Unmarshal(body, &pokemonLocations)
 	if err != nil {
