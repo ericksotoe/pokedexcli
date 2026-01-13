@@ -1,0 +1,44 @@
+package repl
+
+import (
+	"fmt"
+	"math/rand"
+)
+
+func commandCatch(cfg *Config, args []string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("Pass in a pokemon name after catch")
+	}
+
+	poke, err := cfg.PokeApiClient.GetPokemon(args[0])
+	if err != nil {
+		return fmt.Errorf("invalid pokemon name")
+	}
+	fmt.Printf("Throwing a Pokeball at %s...\n", poke.Name)
+	difficulty := chanceToCatch(poke.BaseXP)
+	chance := rand.Intn(100)
+	fmt.Printf("Pokemon: %s\nDifficulty: %d\nLuck: %d\n", poke.Name, difficulty, chance)
+	if chance < difficulty {
+		fmt.Printf("%s was caught!\n", poke.Name)
+	} else {
+		fmt.Printf("%s escaped!\n", poke.Name)
+	}
+	return nil
+}
+
+func chanceToCatch(baseXP int) (difficultyToCatch int) {
+	switch {
+	case baseXP <= 50:
+		return 80
+	case baseXP <= 100:
+		return 60
+	case baseXP <= 200:
+		return 40
+	case baseXP <= 250:
+		return 25
+	case baseXP <= 270:
+		return 15
+	default:
+		return 5
+	}
+}

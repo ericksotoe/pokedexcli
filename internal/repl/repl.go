@@ -12,6 +12,7 @@ import (
 // this struct will hold the next and previous urls for the map command
 type Config struct {
 	PokeApiClient pokeapi.Client
+	CaughtPokemon map[string]pokeapi.Pokemon
 	Next          *string
 	Previous      *string
 }
@@ -47,9 +48,14 @@ func getCommands() map[string]cliCommand {
 			callback:    commandMapB,
 		},
 		"explore": {
-			name: "explore",
+			name:        "explore",
 			description: "Explores the pokemon found at the given location",
-			callback: commandExplore,
+			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Attampt to catch the named pokemon",
+			callback:    commandCatch,
 		},
 	}
 }
