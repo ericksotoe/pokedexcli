@@ -11,8 +11,8 @@ import (
 
 // this struct will hold the next and previous urls for the map command
 type Config struct {
+	Pokedex       map[string]pokeapi.Pokemon
 	PokeApiClient pokeapi.Client
-	CaughtPokemon map[string]pokeapi.Pokemon
 	Next          *string
 	Previous      *string
 }
